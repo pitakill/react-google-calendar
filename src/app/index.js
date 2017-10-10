@@ -1,4 +1,4 @@
 import React from 'react';
-import Calendar from '../components/calendar';
+import Calendar from 'C/calendar';
 
 export default () => <Calendar/>;

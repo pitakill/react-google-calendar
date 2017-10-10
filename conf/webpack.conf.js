@@ -41,6 +41,7 @@ module.exports = {
     ]
   },
   plugins: [
+    new webpack.DefinePlugin({ 'process.env': { 'NODE_ENV': JSON.stringify('development') }}),
     new webpack.optimize.OccurrenceOrderPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),
     FailPlugin,
@@ -64,5 +65,11 @@ module.exports = {
     'webpack/hot/dev-server',
     'webpack-hot-middleware/client',
     `./${conf.path.src('index')}`
-  ]
+  ],
+  resolve: {
+    alias: {
+      C: path.resolve(__dirname, '../src/components/')
+    },
+    extensions: ['.js', '.jsx', '.scss', '.css', '.es6', '.sass']
+  }
 };
