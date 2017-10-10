@@ -1,3 +1,4 @@
 import React from 'react';
+import Calendar from '../components/calendar';
 
-export default () => <h1>{'Hello world!'}</h1>;
+export default () => <Calendar/>;
