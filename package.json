@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "moment": "^2.18.1",
+    "prop-types": "^15.6.0",
     "react": "^15.4.2",
     "react-big-calendar": "^0.16.1",
     "react-dom": "^15.4.2"

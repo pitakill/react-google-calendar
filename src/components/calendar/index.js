@@ -1,8 +1,8 @@
 import React from 'react';
 import BigCalendar from 'react-big-calendar';
 import moment from 'moment';
+import PropTypes from 'prop-types';
 
-import events from './fakeData';
 import './styles';
 
 BigCalendar.setLocalizer(
@@ -15,8 +15,21 @@ const style = {
   width: '80vw'
 };
 
-export default () => (
+const Calendar = props => (
   <div {...{style}}>
-    <BigCalendar {...{events}}/>
+    <BigCalendar {...props}/>
   </div>
 );
+
+Calendar.propTypes = {
+  events: PropTypes.arrayOf(
+    PropTypes.shape({
+      title: PropTypes.string.isRequired,
+      allDay: PropTypes.bool,
+      start: PropTypes.object,
+      end: PropTypes.object
+    })
+  ).isRequired
+};
+
+export default Calendar;
