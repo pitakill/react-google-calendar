@@ -12,7 +12,8 @@ BigCalendar.setLocalizer(
 const style = {
   height: '80vh',
   margin: 'auto',
-  width: '80vw'
+  paddingLeft: '300px',
+  paddingRight: '50px'
 };
 
 const Calendar = props => {
@@ -49,7 +50,9 @@ const Calendar = props => {
 
   return (
     <div {...{style}}>
-      <BigCalendar {...{events}}/>
+      <BigCalendar
+        {...{events}}
+        />
     </div>
   );
 };
