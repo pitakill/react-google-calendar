@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Calendar from 'C/calendar';
-import Button from 'C/button';
+import RaisedButton from 'material-ui/RaisedButton';
 
 import {
   CLIENT_ID as clientId,
@@ -21,7 +21,7 @@ export default class App extends React.Component {
     this.state = {
       events: [],
       onClick: this.handleLogin,
-      text: 'Login'
+      label: 'Login'
     };
   }
 
@@ -51,7 +51,7 @@ export default class App extends React.Component {
 
   async updateSigninStatus(isSignedIn) {
     if (isSignedIn) {
-      const {result: {items: rawEvents}} = await gapi.client.calendar.events.list({
+      const {result: {items: events}} = await gapi.client.calendar.events.list({
         calendarId: 'primary',
         timeMin: (new Date()).toISOString(),
         showDeleted: false,
@@ -60,28 +60,16 @@ export default class App extends React.Component {
         orderBy: 'startTime'
       });
 
-      const events = rawEvents.map(
-        ({
-          summary: title,
-          start: {dateTime: start},
-          end: {dateTime: end}
-        }) => ({
-          title,
-          start,
-          end
-        })
-      );
-
       this.setState({
         events,
         onClick: this.handleSignout,
-        text: 'Logout'
+        label: 'Logout'
       });
     } else {
       this.setState({
         events: [],
         onClick: this.handleLogin,
-        text: 'Login'
+        label: 'Login'
       });
     }
   }
@@ -90,12 +78,14 @@ export default class App extends React.Component {
     const {
       events,
       onClick,
-      text
+      label
     } = this.state;
+
+    const primary = true;
 
     return (
       <div>
-        <Button {...{onClick, text}}/>
+        <RaisedButton {...{onClick, label, primary}}/>
         {events.length === 0 ? null : <Calendar {...{events}}/>}
       </div>
     );

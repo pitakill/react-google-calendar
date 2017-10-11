@@ -15,19 +15,51 @@ const style = {
   width: '80vw'
 };
 
-const Calendar = props => (
-  <div {...{style}}>
-    <BigCalendar {...props}/>
-  </div>
-);
+const Calendar = props => {
+  const {events: rawEvents} = props;
+
+  const events = rawEvents.map(event => {
+    const {
+      summary: title,
+      start: originalStart,
+      end: originalEnd
+    } = event;
+
+    let allDay;
+    let start;
+    let end;
+
+    if (originalStart.date) {
+      allDay = true;
+      start = moment(originalStart.date).toDate();
+      end = new Date(originalEnd.date);
+    } else {
+      allDay = false;
+      start = new Date(originalStart.dateTime);
+      end = new Date(originalEnd.dateTime);
+    }
+
+    return {
+      allDay,
+      title,
+      start,
+      end
+    };
+  });
+
+  return (
+    <div {...{style}}>
+      <BigCalendar {...{events}}/>
+    </div>
+  );
+};
 
 Calendar.propTypes = {
   events: PropTypes.arrayOf(
     PropTypes.shape({
-      title: PropTypes.string.isRequired,
-      allDay: PropTypes.bool,
-      start: PropTypes.string.isRequired,
-      end: PropTypes.string.isRequired
+      summary: PropTypes.string.isRequired,
+      start: PropTypes.object.isRequired,
+      end: PropTypes.object.isRequired
     })
   ).isRequired
 };
