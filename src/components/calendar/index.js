@@ -26,8 +26,8 @@ Calendar.propTypes = {
     PropTypes.shape({
       title: PropTypes.string.isRequired,
       allDay: PropTypes.bool,
-      start: PropTypes.object,
-      end: PropTypes.object
+      start: PropTypes.string.isRequired,
+      end: PropTypes.string.isRequired
     })
   ).isRequired
 };

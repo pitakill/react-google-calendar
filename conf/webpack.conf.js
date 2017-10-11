@@ -68,7 +68,8 @@ module.exports = {
   ],
   resolve: {
     alias: {
-      C: path.resolve(__dirname, '../src/components/')
+      C: path.resolve(__dirname, '../src/components/'),
+      Constants$: path.resolve(__dirname, '../src/constants/index.js'),
     },
     extensions: ['.js', '.jsx', '.scss', '.css', '.es6', '.sass']
   }
