@@ -1,6 +1,6 @@
 /* global gapi */
-
-import React from 'react';
+// @flow
+import * as React from 'react';
 import Calendar from 'C/calendar';
 import DatePicker from 'material-ui/Datepicker';
 import Drawer from 'material-ui/Drawer';
@@ -14,20 +14,46 @@ import {
   SCOPES as scope
 } from 'Constants';
 
-export default class App extends React.Component {
-  constructor(props) {
-    super(props);
+type GCEvent = {
+  id: string,
+  summary: string,
+  start: {
+    date?: string,
+    dateTime?: string
+  },
+  end: {
+    date?: string,
+    dateTime?: string
+  }
+};
 
-    this.getEvents = this.getEvents.bind(this);
-    this.handleAddEvent = this.handleAddEvent.bind(this);
-    this.handleDatePickerChange = this.handleDatePickerChange.bind(this);
-    this.handleDeleteEvent = this.handleDeleteEvent.bind(this);
-    this.handleTextFieldChange = this.handleTextFieldChange.bind(this);
-    this.handleTimePickerEnd = this.handleTimePickerEnd.bind(this);
-    this.handleTimePickerStart = this.handleTimePickerStart.bind(this);
-    this.handleLogin = this.handleLogin.bind(this);
-    this.handleSignout = this.handleSignout.bind(this);
-    this.updateSigninStatus = this.updateSigninStatus.bind(this);
+type AppProps = {};
+
+type AppState = {
+  events: Array<GCEvent>,
+  onClick: Function,
+  label: string,
+  isSignedIn: boolean,
+  titleEvent?: string,
+  pickerDate?: Date,
+  pickerTimeEnd?: Date,
+  pickerTimeStart?: Date
+};
+
+export default class App extends React.PureComponent<AppProps, AppState> {
+  constructor(): void {
+    super();
+
+    (this:any).getEvents = this.getEvents.bind(this);
+    (this:any).handleAddEvent = this.handleAddEvent.bind(this);
+    (this:any).handleDatePickerChange = this.handleDatePickerChange.bind(this);
+    (this:any).handleDeleteEvent = this.handleDeleteEvent.bind(this);
+    (this:any).handleTextFieldChange = this.handleTextFieldChange.bind(this);
+    (this:any).handleTimePickerEnd = this.handleTimePickerEnd.bind(this);
+    (this:any).handleTimePickerStart = this.handleTimePickerStart.bind(this);
+    (this:any).handleLogin = this.handleLogin.bind(this);
+    (this:any).handleSignout = this.handleSignout.bind(this);
+    (this:any).updateSigninStatus = this.updateSigninStatus.bind(this);
 
     this.state = {
       events: [],
@@ -42,7 +68,7 @@ export default class App extends React.Component {
     };
   }
 
-  componentDidMount() {
+  componentDidMount(): void {
     // Init gapi
     gapi.load('client:auth2', () => {
       gapi.client.init({
@@ -58,7 +84,7 @@ export default class App extends React.Component {
     });
   }
 
-  async getEvents() {
+  async getEvents(): Promise<*> {
     try {
       const {result: {items}} = await gapi.client.calendar.events.list({
         calendarId: 'primary',
@@ -75,7 +101,7 @@ export default class App extends React.Component {
     }
   }
 
-  handleAddEvent() {
+  handleAddEvent(): void {
     const {
       pickerDate,
       pickerTimeEnd,
@@ -83,51 +109,53 @@ export default class App extends React.Component {
       titleEvent: summary
     } = this.state;
 
-    const year = pickerDate.getFullYear();
-    const month = pickerDate.getMonth();
-    const day = pickerDate.getDate();
+    if (pickerDate && pickerTimeEnd && pickerTimeStart) {
+      const year = pickerDate.getFullYear();
+      const month = pickerDate.getMonth();
+      const day = pickerDate.getDate();
 
-    const hourEnd = pickerTimeEnd.getHours();
-    const minuteEnd = pickerTimeEnd.getMinutes();
+      const hourEnd = pickerTimeEnd.getHours();
+      const minuteEnd = pickerTimeEnd.getMinutes();
 
-    const hourStart = pickerTimeStart.getHours();
-    const minuteStart = pickerTimeStart.getMinutes();
+      const hourStart = pickerTimeStart.getHours();
+      const minuteStart = pickerTimeStart.getMinutes();
 
-    const start = new Date(year, month, day, hourStart, minuteStart);
-    const end = new Date(year, month, day, hourEnd, minuteEnd);
+      const start = new Date(year, month, day, hourStart, minuteStart);
+      const end = new Date(year, month, day, hourEnd, minuteEnd);
 
-    const resource = {
-      summary,
-      start: {
-        dateTime: start
-      },
-      end: {
-        dateTime: end
-      }
-    };
+      const resource = {
+        summary,
+        start: {
+          dateTime: start
+        },
+        end: {
+          dateTime: end
+        }
+      };
 
-    const request = gapi.client.calendar.events.insert({
-      calendarId: 'primary',
-      resource
-    });
-
-    request.execute(event => {
-      const events = this.state.events.concat([event]);
-      this.setState({
-        events,
-        pickerDate: null,
-        pickerTimeEnd: null,
-        pickerTimeStart: null,
-        titleEvent: ''
+      const request = gapi.client.calendar.events.insert({
+        calendarId: 'primary',
+        resource
       });
-    });
+
+      request.execute(event => {
+        const events = this.state.events.concat([event]);
+        this.setState({
+          events,
+          pickerDate: undefined,
+          pickerTimeEnd: undefined,
+          pickerTimeStart: undefined,
+          titleEvent: ''
+        });
+      });
+    }
   }
 
-  handleDatePickerChange(event, data) {
+  handleDatePickerChange(event: void, data: Date): void {
     this.setState({pickerDate: data});
   }
 
-  async handleDeleteEvent({id: eventId}) {
+  async handleDeleteEvent({id: eventId}: GCEvent): Promise<*> {
     const response = await new Promise(resolve => {
       const request = gapi.client.calendar.events.delete({
         calendarId: 'primary',
@@ -145,27 +173,27 @@ export default class App extends React.Component {
     }
   }
 
-  handleTimePickerEnd(event, data) {
+  handleTimePickerEnd(event: void, data: Date): void {
     this.setState({pickerTimeEnd: data});
   }
 
-  handleTimePickerStart(event, data) {
+  handleTimePickerStart(event: void, data: Date): void {
     this.setState({pickerTimeStart: data});
   }
 
-  handleTextFieldChange(event) {
-    this.setState({titleEvent: event.target.value});
+  handleTextFieldChange(event: Event, data: string): void {
+    this.setState({titleEvent: data});
   }
 
-  handleLogin() {
+  handleLogin(): void {
     gapi.auth2.getAuthInstance().signIn();
   }
 
-  handleSignout() {
+  handleSignout(): void {
     gapi.auth2.getAuthInstance().signOut();
   }
 
-  async updateSigninStatus(isSignedIn) {
+  async updateSigninStatus(isSignedIn: boolean): Promise<*> {
     if (isSignedIn) {
       const events = await this.getEvents();
 
@@ -185,7 +213,7 @@ export default class App extends React.Component {
     }
   }
 
-  render() {
+  render(): React.Element<*> {
     const {
       events,
       onClick,

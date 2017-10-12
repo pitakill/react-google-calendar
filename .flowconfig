@@ -1,0 +1,18 @@
+[ignore]
+.*/node_modules/immutable/.*
+
+[include]
+
+[libs]
+flow-typed
+
+[lints]
+
+[options]
+module.file_ext=.js
+module.file_ext=.json
+module.file_ext=.jsx
+module.file_ext=.css
+module.file_ext=.scss
+module.name_mapper='^C\/\(.*\)$' -> '<PROJECT_ROOT>/src/components/\1'
+module.name_mapper='^Constants$' -> '<PROJECT_ROOT>/src/constants/index.js'

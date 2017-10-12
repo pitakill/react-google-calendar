@@ -1,7 +1,7 @@
-import React from 'react';
+// @flow
+import * as React from 'react';
 import BigCalendar from 'react-big-calendar';
 import moment from 'moment';
-import PropTypes from 'prop-types';
 
 import './styles';
 
@@ -16,7 +16,25 @@ const style = {
   paddingRight: '50px'
 };
 
-const Calendar = props => {
+type GCEvent = {
+  id: string,
+  summary: string,
+  start: {
+    date?: string,
+    dateTime?: string
+  },
+  end: {
+    date?: string,
+    dateTime?: string
+  }
+};
+
+type CalendarProps = {
+  events: Array<GCEvent>,
+  deleteEvent: Function
+};
+
+export default (props: CalendarProps): React.Element<any> => {
   const {
     events: rawEvents,
     deleteEvent: onSelectEvent
@@ -34,14 +52,14 @@ const Calendar = props => {
     let start;
     let end;
 
-    if (originalStart.date) {
+    if (originalStart.date === undefined) {
+      allDay = false;
+      start = moment(originalStart.dateTime).toDate();
+      end = moment(originalEnd.dateTime).toDate();
+    } else {
       allDay = true;
       start = moment(originalStart.date).toDate();
-      end = new Date(originalEnd.date);
-    } else {
-      allDay = false;
-      start = new Date(originalStart.dateTime);
-      end = new Date(originalEnd.dateTime);
+      end = moment.utc(originalEnd.date).toDate();
     }
 
     return {
@@ -62,17 +80,3 @@ const Calendar = props => {
     </div>
   );
 };
-
-Calendar.propTypes = {
-  events: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      summary: PropTypes.string.isRequired,
-      start: PropTypes.object.isRequired,
-      end: PropTypes.object.isRequired
-    })
-  ).isRequired,
-  deleteEvent: PropTypes.func
-};
-
-export default Calendar;
