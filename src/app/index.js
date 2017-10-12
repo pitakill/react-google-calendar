@@ -18,8 +18,10 @@ export default class App extends React.Component {
   constructor(props) {
     super(props);
 
+    this.getEvents = this.getEvents.bind(this);
     this.handleAddEvent = this.handleAddEvent.bind(this);
     this.handleDatePickerChange = this.handleDatePickerChange.bind(this);
+    this.handleDeleteEvent = this.handleDeleteEvent.bind(this);
     this.handleTextFieldChange = this.handleTextFieldChange.bind(this);
     this.handleTimePickerEnd = this.handleTimePickerEnd.bind(this);
     this.handleTimePickerStart = this.handleTimePickerStart.bind(this);
@@ -54,6 +56,23 @@ export default class App extends React.Component {
         this.updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
       });
     });
+  }
+
+  async getEvents() {
+    try {
+      const {result: {items}} = await gapi.client.calendar.events.list({
+        calendarId: 'primary',
+        timeMin: (new Date()).toISOString(),
+        showDeleted: false,
+        singleEvents: true,
+        maxResults: 10,
+        orderBy: 'startTime'
+      });
+
+      return items;
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   handleAddEvent() {
@@ -108,6 +127,24 @@ export default class App extends React.Component {
     this.setState({pickerDate: data});
   }
 
+  async handleDeleteEvent({id: eventId}) {
+    const response = await new Promise(resolve => {
+      const request = gapi.client.calendar.events.delete({
+        calendarId: 'primary',
+        eventId
+      });
+
+      request.execute(() => {
+        resolve(true);
+      });
+    });
+
+    if (response) {
+      const events = await this.getEvents();
+      this.setState({events});
+    }
+  }
+
   handleTimePickerEnd(event, data) {
     this.setState({pickerTimeEnd: data});
   }
@@ -130,14 +167,7 @@ export default class App extends React.Component {
 
   async updateSigninStatus(isSignedIn) {
     if (isSignedIn) {
-      const {result: {items: events}} = await gapi.client.calendar.events.list({
-        calendarId: 'primary',
-        timeMin: (new Date()).toISOString(),
-        showDeleted: false,
-        singleEvents: true,
-        maxResults: 10,
-        orderBy: 'startTime'
-      });
+      const events = await this.getEvents();
 
       this.setState({
         events,
@@ -193,6 +223,8 @@ export default class App extends React.Component {
       value: titleEvent
     };
 
+    const deleteEvent = this.handleDeleteEvent;
+
     const disabled = !(titleEvent && pickerDate && pickerTimeEnd && pickerTimeStart);
 
     const style = {
@@ -221,7 +253,7 @@ export default class App extends React.Component {
             </div> : null
           }
         </Drawer>
-        {isSignedIn ? <Calendar {...{events}}/> : null}
+        {isSignedIn ? <Calendar {...{events, deleteEvent}}/> : null}
       </div>
     );
   }

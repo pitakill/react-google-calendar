@@ -17,10 +17,14 @@ const style = {
 };
 
 const Calendar = props => {
-  const {events: rawEvents} = props;
+  const {
+    events: rawEvents,
+    deleteEvent: onSelectEvent
+  } = props;
 
   const events = rawEvents.map(event => {
     const {
+      id,
       summary: title,
       start: originalStart,
       end: originalEnd
@@ -42,6 +46,7 @@ const Calendar = props => {
 
     return {
       allDay,
+      id,
       title,
       start,
       end
@@ -51,7 +56,8 @@ const Calendar = props => {
   return (
     <div {...{style}}>
       <BigCalendar
-        {...{events}}
+        selectable
+        {...{events, onSelectEvent}}
         />
     </div>
   );
@@ -60,11 +66,13 @@ const Calendar = props => {
 Calendar.propTypes = {
   events: PropTypes.arrayOf(
     PropTypes.shape({
+      id: PropTypes.string.isRequired,
       summary: PropTypes.string.isRequired,
       start: PropTypes.object.isRequired,
       end: PropTypes.object.isRequired
     })
-  ).isRequired
+  ).isRequired,
+  deleteEvent: PropTypes.func
 };
 
 export default Calendar;
