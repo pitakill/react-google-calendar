@@ -40,6 +40,7 @@ module.exports = {
     ]
   },
   plugins: [
+    new webpack.DefinePlugin({ 'process.env': { 'NODE_ENV': JSON.stringify('production') }}),
     new webpack.optimize.OccurrenceOrderPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),
     FailPlugin,
@@ -66,7 +67,15 @@ module.exports = {
     filename: '[name]-[hash].js'
   },
   entry: {
+    prev: 'babel-polyfill',
     app: `./${conf.path.src('index')}`,
     vendor: Object.keys(pkg.dependencies)
+  },
+  resolve: {
+    alias: {
+      C: path.resolve(__dirname, '../src/components/'),
+      Constants$: path.resolve(__dirname, '../src/constants/index.js'),
+    },
+    extensions: ['.js', '.jsx', '.scss', '.css', '.es6', '.sass']
   }
 };
